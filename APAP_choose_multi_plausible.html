@@ -1,0 +1,593 @@
+<link href="https://s3.amazonaws.com/mturk-public/bs30/css/bootstrap.min.css" rel="stylesheet" /><script src="https://s3.amazonaws.com/MTurks/jquery-1.11.2.min.js"></script><script src="https://s3.amazonaws.com/MTurks/jquery-ui.min.js"></script><script src="https://s3.amazonaws.com/MTurks/image-picker.min.js"></script>
+<style type="text/css">body {
+				margin: 0px 50px;
+				font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+				font-size: 14pt;
+			}
+			
+			#content_div {
+				margin: auto;
+				/*width: 900px;*/
+				width: 1300px;
+                position: relative;
+			}
+			
+			h3 {
+			}
+			
+			#long_info {
+			}
+			
+			#couhes {
+				color: #777;
+				font-style: italic;
+				margin: 20px 0px;
+				font-size: 12pt;
+			}
+			
+			#start_button, #continue_button {
+				width:300px;
+				height:80px;
+				font-size:30px;
+				border: 2px solid #AAA;
+				border-radius: 25px;
+				background-color: #EEE;
+			}
+			#start_button:hover {
+				border: 2px solid #999;
+				background-color: #CCC;
+			}
+			
+			button, #submit_button {
+				width:200px;
+				height:50px;
+				font-size:24px;
+				border: 1px solid #CCC;
+				border-radius: 10px;
+				background-color: #EEE;
+			}
+			button:hover {
+				border: 1px solid #AAA;
+				background-color: #CCC;
+			}
+			
+			#images_div {
+				margin: 100px 0px 40px 0px;
+			}
+			
+			#trial_num {
+				margin: 20px 0px 0px 0px;
+				font-size:16px;
+				color:#777;
+				font-style:italic;
+			}
+			
+			#feedback {
+			}
+			
+			#experiment_start {
+				font-size: 20px;
+			}
+			
+			table.demo_imgs {
+				text-align: center;
+				font-size: 12pt;
+				margin-top: 20px;
+			}
+			table.demo_imgs td {
+				padding: 2px 10px 0px 10px;
+			}
+</style>
+
+<script src="//uniqueturker.myleott.com/lib.js" type="text/javascript"></script>
+<script type="text/javascript">
+(function(){
+    var ut_id = "${unique_id}";
+    if (UTWorkerLimitReached(ut_id)) {
+        document.getElementById('mturk_form').style.display = 'none';
+        document.getElementsByTagName('body')[0].innerHTML = "You have already completed the maximum number of HITs allowed by this requester. Please click 'Return HIT' to avoid any impact on your approval rating.";
+    }
+})();
+</script>
+
+
+<script type="text/javascript">
+
+
+////// HTML GENERATOR WRITES VALUES INTO THESE VARIABLES //////
+var num_real_comparisons = 20;
+var num_vigilance_tests = 5;
+var img_base_url = 'https://as-plausible-as-possible.s3.us-east-2.amazonaws.com/';
+var prompt_text = 'Red circles indicate the source handles and Green circles indicate the target handles. We want to edit images moving the source handles to target handles. Which one appears the most plausible and realistic edited image to you? Choose one of the following images.';
+///////////////////////////////////////////////////////////////
+
+
+
+// from http://stackoverflow.com/questions/15589764/how-to-hide-the-link-to-an-external-web-page-in-a-hit-before-workers-accept-the		
+$.extend({
+  getUrlVars: function(){
+    // From http://code.google.com/p/js-uri/source/browse/trunk/lib/URI.js
+    var parser = /^(?:([^:\/?\#]+):)?(?:\/\/([^\/?\#]*))?([^?\#]*)(?:\?([^\#]*))?(?:\#(.*))?/;
+    var result = window.location.href.match(parser);
+    var scheme    = result[1] || null;
+    var authority = result[2] || null;
+    var path      = result[3] || null;
+    var query     = result[4] || null;
+    var fragment  = result[5] || null
+    if (query === null || query === undefined) {
+      return {};
+    }
+    var vars = [], hash;
+    var hashes = query.split('&');
+    for(var i = 0; i < hashes.length; i++)
+    {
+      hash = hashes[i].split('=');
+      vars.push(hash[0]);
+      vars[hash[0]] = hash[1];
+    }
+    return vars;
+  },
+  getUrlVar: function(name){
+    return $.getUrlVars()[name];
+  }
+});
+
+function setBodyHeight() {
+  var wh = $(window).height();
+  $('body').height(wh); // body height = window height
+}
+
+function sequence_helper(gt_side,image_original,image_left,image_mid,image_right) {
+    var curr_im = null;
+	p.gt_side.push(gt_side);
+	curr_im = new Image();
+	curr_im.src = base_url + image_original + '.png';
+	p.images_original.push(curr_im);
+	curr_im = new Image();
+	curr_im.src = base_url + image_left + '.png';
+	p.images_left.push(curr_im);
+	curr_im = new Image();
+	curr_im.src = base_url + image_mid + '.png';
+	p.images_mid.push(curr_im);
+	curr_im = new Image();
+	curr_im.src = base_url + image_right + '.png';
+	p.images_right.push(curr_im);
+}
+
+function makeExperiment() {
+    p.is_practice = false;
+	p.im_num = 0;
+    p.initialized = false;
+    p.is_assigned = ($.getUrlVar('assignmentId') != 'ASSIGNMENT_ID_NOT_AVAILABLE');
+    p.practice_intro_shown = false;
+    p.experiment_intro_shown = false;
+	p.npractice = 0;
+	p.total_num_ims = num_real_comparisons + num_vigilance_tests;
+	p.gt_side = [];
+	p.images_original = [];
+	p.images_left = [];
+	p.images_mid = [];
+	p.images_right = [];
+
+	//////// HTML GENERATOR FILLS THIS IN ///////////
+	sequence_helper("${gt_side1}","${images_original1}","${images_left1}","${images_mid1}","${images_right1}");
+sequence_helper("${gt_side2}","${images_original2}","${images_left2}","${images_mid2}","${images_right2}");
+sequence_helper("${gt_side3}","${images_original3}","${images_left3}","${images_mid3}","${images_right3}");
+sequence_helper("${gt_side4}","${images_original4}","${images_left4}","${images_mid4}","${images_right4}");
+sequence_helper("${gt_side5}","${images_original5}","${images_left5}","${images_mid5}","${images_right5}");
+sequence_helper("${gt_side6}","${images_original6}","${images_left6}","${images_mid6}","${images_right6}");
+sequence_helper("${gt_side7}","${images_original7}","${images_left7}","${images_mid7}","${images_right7}");
+sequence_helper("${gt_side8}","${images_original8}","${images_left8}","${images_mid8}","${images_right8}");
+sequence_helper("${gt_side9}","${images_original9}","${images_left9}","${images_mid9}","${images_right9}");
+sequence_helper("${gt_side10}","${images_original10}","${images_left10}","${images_mid10}","${images_right10}");
+sequence_helper("${gt_side11}","${images_original11}","${images_left11}","${images_mid11}","${images_right11}");
+sequence_helper("${gt_side12}","${images_original12}","${images_left12}","${images_mid12}","${images_right12}");
+sequence_helper("${gt_side13}","${images_original13}","${images_left13}","${images_mid13}","${images_right13}");
+sequence_helper("${gt_side14}","${images_original14}","${images_left14}","${images_mid14}","${images_right14}");
+sequence_helper("${gt_side15}","${images_original15}","${images_left15}","${images_mid15}","${images_right15}");
+sequence_helper("${gt_side16}","${images_original16}","${images_left16}","${images_mid16}","${images_right16}");
+sequence_helper("${gt_side17}","${images_original17}","${images_left17}","${images_mid17}","${images_right17}");
+sequence_helper("${gt_side18}","${images_original18}","${images_left18}","${images_mid18}","${images_right18}");
+sequence_helper("${gt_side19}","${images_original19}","${images_left19}","${images_mid19}","${images_right19}");
+sequence_helper("${gt_side20}","${images_original20}","${images_left20}","${images_mid20}","${images_right20}");
+sequence_helper("${gt_side21}","${images_original21}","${images_left21}","${images_mid21}","${images_right21}");
+sequence_helper("${gt_side22}","${images_original22}","${images_left22}","${images_mid22}","${images_right22}");
+sequence_helper("${gt_side23}","${images_original23}","${images_left23}","${images_mid23}","${images_right23}");
+sequence_helper("${gt_side24}","${images_original24}","${images_left24}","${images_mid24}","${images_right24}");
+sequence_helper("${gt_side25}","${images_original25}","${images_left25}","${images_mid25}","${images_right25}");
+
+	/////////////////////////////////////////////////
+
+    return this;
+}
+
+
+var p = {};
+var base_url = img_base_url;
+var first_trial = true;
+var num_correct = 0;
+
+function assert(x, msg) { if (!x) { throw("Assertion failed: " + msg); } }
+
+function now() { return (new Date()).getTime() / 1000.; }
+
+function end() {
+    $('#choice_intro').hide();
+    $('#done').show();
+	$("#submitButton").show();
+}
+
+function showFixation() {
+    document.im.src = p.fixation_im.src;
+}
+function showBlank() {
+    document.im.src = "images/start_image.png";
+}
+
+function continue_to_main_expt() {
+	$('#experiment_start').hide();
+	next();
+}
+
+function next() {
+	
+	$('#feedbackA').html('');
+	$('#feedbackB').html('');
+	$('#feedbackC').html('');
+	
+	$('#imageO').css('border','0px solid black');
+	$('#imageA').css('border','0px solid black');
+	$('#imageB').css('border','0px solid black');
+	$('#imageC').css('border','0px solid black');
+	
+    if (p.is_practice && (p.im_num == p.npractice)) {
+    	
+		p.is_practice = false;
+		
+    	$('#feedback').hide();	
+    	$('#imageO').hide();
+    	$('#imageA').hide();
+    	$('#imageB').hide();
+    	$('#imageC').hide();
+    	$('#imageO_div').hide();
+    	$('#imageA_div').hide();
+    	$('#imageB_div').hide();
+		$('#imageC_div').hide();
+    	$('#choice_intro').html("");
+      
+    	$('#experiment_start').show();
+    	
+    	return;
+    }
+	else if (p.im_num == p.total_num_ims) {
+		
+		end();
+		
+		return;
+	}
+	
+	var display_time = 1000;
+	var fade_time = 200;
+	var isi = 300;
+	
+	var offset_time = 5000;
+	
+    $('#feedback').hide();	
+	$('#imageA').hide();
+	$('#imageB').hide();
+	$('#imageC').hide();
+	$('#imageD').hide();
+
+	$('#choice_intro').html("");
+	$('#choice_intro').show();
+
+	$('#imageO_div').show();
+	$('#imageA_div').show();
+	$('#imageB_div').show();
+	$('#imageC_div').show();
+	
+	if (p.is_practice) {
+		$('#trial_num').html("<br><center>Practice trial " + (p.im_num+1) + " out of " + p.npractice + "</center>");
+	}
+	else {
+		$('#trial_num').html("<br><center>Trial " + (p.im_num+1-p.npractice) + " out of " + (p.total_num_ims-p.npractice) + "</center>");
+	}
+
+	var imageO = document.getElementById('imageO');
+	imageO.src = p.images_original[p.im_num].src;
+		
+	var imageA = document.getElementById('imageA');
+	imageA.src = p.images_left[p.im_num].src;
+
+	var imageB = document.getElementById('imageB');
+	imageB.src = p.images_mid[p.im_num].src;
+
+	var imageC = document.getElementById('imageC');
+	imageC.src = p.images_right[p.im_num].src;
+
+
+	$('#choice_intro').html(prompt_text).show();
+    $("#imageO").show();
+ 	$("#imageA").show();
+    $("#imageB").show();
+	$("#imageC").show();
+    
+ 
+    $('#trial_num').show(); 
+	$('#buttonA').fadeIn(fade_time);
+    $('#buttonB').fadeIn(fade_time);
+	$('#buttonC').fadeIn(fade_time);
+    
+}
+
+
+function submitAnswer(answer) {
+	
+	$('#buttonA').hide();
+	$('#buttonB').hide();
+	$('#buttonC').hide();
+	$('#trial_num').hide();
+	
+	if (p.is_practice) {
+		   var is_correct = (p.gt_side[p.im_num]!=answer);
+		
+		   if (is_correct) {
+	       	   $('#feedback').html('<img width=24px src="http://web.mit.edu/phillipi/Public/colorization/check.png"/><br><span style="color:green;">You are correct!</span>');
+		   }
+		   else {
+			   $('#feedback').html('<span style="color:#cc0000">Incorrect. That image was real.</span>');
+		   }
+		   
+		   if (answer=='a') {
+			   if (is_correct) {
+	      	   		$('#imageA').css('border','6px solid green');
+		   	   }
+			   else {
+			   		$('#imageA').css('border','6px solid #cc0000');
+			   }
+		   }
+		   else if (answer=='b') {
+			   if (is_correct) {
+	      	   		$('#imageB').css('border','6px solid green');
+		   	   }
+			   else {
+			   		$('#imageB').css('border','6px solid #cc0000');
+			   }
+		   }
+		   else {
+			   if (is_correct) {
+	      	   		$('#imageC').css('border','6px solid green');
+		   	   }
+			   else {
+			   		$('#imageC').css('border','6px solid #cc0000');
+			   }
+		   }
+		
+		$('#feedback').show();
+		$('#choice_intro').html('');
+		if (p.gt_side[p.im_num]=='a') {
+			$('#feedbackA').html('Real');
+			$('#feedbackB').html('Fake');
+			$('#feedbackC').html('Fake');
+		}
+		else if (p.gt_side[p.im_num]=='b') {
+			$('#feedbackA').html('Fake');
+			$('#feedbackB').html('Real');
+			$('#feedbackC').html('Fake');
+		}
+		else {
+			$('#feedbackA').html('Fake');
+			$('#feedbackB').html('Fake');
+			$('#feedbackC').html('Real');
+		}
+   		$('#imageO').show();
+   		$('#imageA').show();
+   		$('#imageB').show();
+   		$('#imageC').show();
+   		$('#imageO_div').show();
+   		$('#imageA_div').show();
+   		$('#imageB_div').show();
+		$('#imageC_div').show();
+   		
+		$("#selection"+(p.im_num+1)).val(answer);
+		
+
+		p.im_num = p.im_num+1;
+				
+		// setTimeout(function() { next(); }, 2000);
+		next();
+	}
+	else {
+		var is_correct = (p.gt_side[p.im_num]!=answer);
+
+		num_correct += is_correct;
+		
+		$('#imageO').hide();
+		$('#imageA').hide();
+		$('#imageB').hide();
+		$('#imageC').hide();
+		$('#imageO_div').hide();
+        $('#imageA_div').hide();
+		$('#imageB_div').hide();
+        $('#imageC_div').hide();
+        $("#choice_intro").hide();	
+	
+		$("#selection"+(p.im_num+1)).val(answer);
+		p.im_num = p.im_num+1;
+				
+		// setTimeout(function() { next(); }, 2400);
+		next();
+	}
+}
+
+function startExperiment() {
+
+    if (p == null) {
+        return;
+    }
+    
+    p.is_practice = false;
+	
+    $('#buttons_start').hide();
+    $('#long_info').hide();
+    $('#couhes').hide();
+    $('#teaser').hide();
+
+    $('#images_div').show();
+
+    next();
+}
+
+
+function init() {
+	
+	$(window).bind('resize', function() { setBodyHeight(); });
+	
+	makeExperiment();
+	
+	$('#imageO').hide();
+	$('#imageA').hide();
+	$('#imageB').hide();
+	$('#imageC').hide();
+	$('#buttonA').hide();
+	$('#buttonB').hide();
+	$('#buttonC').hide();
+	
+	$("#submitButton").hide();
+	
+	if (p.is_assigned) {
+		$('#start_button').removeAttr('disabled');
+		$('#start_button').html('Start!');
+	}
+}
+
+$(document).ready(init);
+
+function restartExperiment() {
+}
+
+</script>
+
+
+
+<div id="content_div">
+	<div align="center" id="images_div" style="display:none" width="100%">
+		<div id="trial_num" style="display:none">&nbsp;</div>
+
+		<div id="choice_intro" style="display:none;">&nbsp;</div>
+
+		<div id="imageO_div" style="height:302px; width:302px; display:inline-block; border:0px solid black;">
+			<img id="imageO" style="display:block;" width="300px" />
+		</div>
+
+		<div id="imageA_div" style="height:302px; width:302px; display:inline-block; border:0px solid black;">
+			<div id="feedbackA" style="display:block; height: 30px">&nbsp;</div>
+			<img id="imageA" style="display:block;" width="300px" />
+			<div id="buttonA" style="position:relative; width:100%; height:25%">
+				<button onclick="submitAnswer('a')" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index: 10; font-size:14pt" type="button">Choose A</button>
+			</div>
+		</div>
+
+		<div id="imageB_div" style="height:302px; width:302px; display:inline-block; border:0px solid black;">
+			<div id="feedbackB" style="display:block; height: 30px">&nbsp;</div>
+			<img id="imageB" style="display:block;" width="300px" />
+			<div id="buttonB" style="position:relative; width:100%; height:25%">
+				<button onclick="submitAnswer('b')" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index: 10; font-size:14pt" type="button">Choose B</button>
+			</div>
+		</div>
+
+		<div id="imageC_div" style="height:302px; width:302px; display:inline-block; border:0px solid black;">
+			<div id="feedbackC" style="display:block; height: 30px">&nbsp;</div>
+			<img id="imageC" style="display:block;" width="300px" />
+			<div id="buttonC" style="position:relative; width:100%; height:25%">
+				<button onclick="submitAnswer('c')" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index: 10; font-size:14pt" type="button">Choose C</button>
+			</div>
+		</div>
+	</div>
+
+	<div align="center" id="feedback" style="display:none">&nbsp;</div>
+
+	<div id="experiment_start" style="width: 1300px; margin: 0 auto; text-align: left; display:none"><br />
+		You&#39;ve completed the practice exercise! Click &quot;Continue&quot; to continue on to the main task. The main task will be identical except that you won&#39;t be told whether or not your guess was correct.
+		<div align="center" id="buttons_continue">
+			<button id="continue_button" onclick="continue_to_main_expt()" type="button">Continue!</button>
+		</div>
+	</div>
+
+	<div align="center" id="short_info" style="width: 80%; margin: 0 auto; text-align: left; display:none">&nbsp;</div>
+	&nbsp;
+
+	<div id="long_info" style="width:100%"><b>About this HIT:</b><br />
+	&nbsp;
+	<ul>
+		<li>It should take about 5 minutes.</li>
+		<br />
+		<li>You will take part in an experiment involving visual perception (~ 5 min). You will be shown sets of images and asked to answer which image looks more natural.<br />
+		&nbsp;</li>
+	</ul>
+	</div>
+
+	<div align="center" id="buttons_start"><br />
+		<button disabled="true" id="start_button" onclick="startExperiment()" type="button">
+			<span style="font-size:16pt">Please accept HIT to start</span>
+		</button>
+		<p>Please accept the HIT to begin!</p>
+	</div>
+</div>
+
+<div align="center" id="done" style="display:none">Thank you! You have completed the experiment.<br />
+&nbsp;
+<div id="score">&nbsp;</div>
+
+<div><textarea cols="31" id="comments" name="comments" rows="3">Comments?</textarea></div>
+<br />
+<br />
+Please click the submit button below to finish.</div>
+
+<div id="couhes"><br />
+<span id="informed_consent_text">By making judgments about these images, you are participating in a study being performed by scientists at KAIST. Your participation in this research is voluntary. You may decline further participation, at any time, without adverse consequences. Your anonymity is assured; the researchers who have requested your participation will not receive any personal information about you.</span></div>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p><br />
+
+<!-- HTML GENERATOR FILLS THIS IN -->
+<input id="selection1" name="selection1" type="hidden" value="unset" />
+<input id="selection2" name="selection2" type="hidden" value="unset" />
+<input id="selection3" name="selection3" type="hidden" value="unset" />
+<input id="selection4" name="selection4" type="hidden" value="unset" />
+<input id="selection5" name="selection5" type="hidden" value="unset" />
+<input id="selection6" name="selection6" type="hidden" value="unset" />
+<input id="selection7" name="selection7" type="hidden" value="unset" />
+<input id="selection8" name="selection8" type="hidden" value="unset" />
+<input id="selection9" name="selection9" type="hidden" value="unset" />
+<input id="selection10" name="selection10" type="hidden" value="unset" />
+<input id="selection11" name="selection11" type="hidden" value="unset" />
+<input id="selection12" name="selection12" type="hidden" value="unset" />
+<input id="selection13" name="selection13" type="hidden" value="unset" />
+<input id="selection14" name="selection14" type="hidden" value="unset" />
+<input id="selection15" name="selection15" type="hidden" value="unset" />
+<input id="selection16" name="selection16" type="hidden" value="unset" />
+<input id="selection17" name="selection17" type="hidden" value="unset" />
+<input id="selection18" name="selection18" type="hidden" value="unset" />
+<input id="selection19" name="selection19" type="hidden" value="unset" />
+<input id="selection20" name="selection20" type="hidden" value="unset" />
+<input id="selection21" name="selection21" type="hidden" value="unset" />
+<input id="selection22" name="selection22" type="hidden" value="unset" />
+<input id="selection23" name="selection23" type="hidden" value="unset" />
+<input id="selection24" name="selection24" type="hidden" value="unset" />
+<input id="selection25" name="selection25" type="hidden" value="unset" />
+
+
+</p>
+
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>

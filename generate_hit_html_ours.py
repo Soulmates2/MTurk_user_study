@@ -30,8 +30,10 @@ args.n_real_comparisons_per_hit = 20
 args.n_vigilance_tests_per_hit = 5
 args.base_url = 'https://as-plausible-as-possible-1.s3.us-east-1.amazonaws.com/'
 args.experiment_description = 'You will take part in an experiment involving visual perception (~ 5 min). You will be shown sets of images and asked to answer which image looks more natural.'
-args.prompt = '(Red circles) indicate the source handles and (Green circles) indicate the target handles. We want to edit images moving the source handles to target handles. Which one appears the most plausible and realistic edited image to you? Choose one of the following images.'
-args.out_filename = 'data/20231031_2d_1/APAP_choose_multi_plausible.html'
+# args.prompt = 'We want to edit images by moving a red point to a blue point. Which one appears the most <b>plausible</b> and <b>realistic</b> edited image to you? Choose one of the following images.'
+# args.prompt = 'We want to edit images by dragging a red point to a blue point. Which output would you expect after dragging the point? Choose one of the following images.'
+args.prompt = 'When the image in the black box is edited by dragging the red point, as indicated by the arrow, while fixing the green point, which of the outputs below do you anticipate? Please select one of the options.'
+args.out_filename = 'data/20231103_2d_1/APAP_choose_multi_plausible.html'
 
 
 

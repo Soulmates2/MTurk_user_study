@@ -20,7 +20,7 @@ parser.add_argument('--n_hits', type=int, default=10)
 # See http://uniqueturker.myleott.com/ for more information about how this works
 parser.add_argument('--unique_id', type=str, default='')
 # The name of the experiment
-parser.add_argument('--experiment_name', type=str, default='20231031_2d_1')
+parser.add_argument('--experiment_name', type=str, default='20231103_2d_1')
 # The name of condition O (Original image before editing)
 parser.add_argument('--conditionO', type=str, default='Source')
 # The name of condition A
@@ -32,7 +32,7 @@ parser.add_argument('--conditionC', type=str, default='ARAP')
 
 
 args = parser.parse_args()
-
+np.random.seed(2024)
 
 
 n_real_comparisons_per_hit = args.n_real_comparisons_per_hit

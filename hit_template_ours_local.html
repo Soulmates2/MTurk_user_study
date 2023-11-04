@@ -206,9 +206,9 @@ function continue_to_main_expt() {
 
 function next() {
 	
-	// $('#feedbackA').html('');
-	// $('#feedbackB').html('');
-	// $('#feedbackC').html('');
+	$('#feedbackA').html('');
+	$('#feedbackB').html('');
+	$('#feedbackC').html('');
 	
 	$('#imageO').css('border','0px solid black');
 	$('#imageA').css('border','0px solid black');
@@ -339,22 +339,22 @@ function submitAnswer(answer) {
 		   }
 		
 		$('#feedback').show();
-		// $('#choice_intro').html('');
-		// if (p.gt_side[p.im_num]=='a') {
-		// 	$('#feedbackA').html('Real');
-		// 	$('#feedbackB').html('Fake');
-		// 	$('#feedbackC').html('Fake');
-		// }
-		// else if (p.gt_side[p.im_num]=='b') {
-		// 	$('#feedbackA').html('Fake');
-		// 	$('#feedbackB').html('Real');
-		// 	$('#feedbackC').html('Fake');
-		// }
-		// else {
-		// 	$('#feedbackA').html('Fake');
-		// 	$('#feedbackB').html('Fake');
-		// 	$('#feedbackC').html('Real');
-		// }
+		$('#choice_intro').html('');
+		if (p.gt_side[p.im_num]=='a') {
+			$('#feedbackA').html('Real');
+			$('#feedbackB').html('Fake');
+			$('#feedbackC').html('Fake');
+		}
+		else if (p.gt_side[p.im_num]=='b') {
+			$('#feedbackA').html('Fake');
+			$('#feedbackB').html('Real');
+			$('#feedbackC').html('Fake');
+		}
+		else {
+			$('#feedbackA').html('Fake');
+			$('#feedbackB').html('Fake');
+			$('#feedbackC').html('Real');
+		}
    		$('#imageO').show();
    		$('#imageA').show();
    		$('#imageB').show();
@@ -452,14 +452,14 @@ function restartExperiment() {
 		<div id="choice_intro" style="display:none;">&nbsp;</div>
 
 		<div id="imageO_div" style="height:302px; width:302px; display:inline-block; border:0px solid black;">
-			<!-- <div id="feedbackO" style="display:block; height: 30px"></div> -->
+			<div id="feedbackO" style="display:block; height: 30px"></div>
 			<img id="imageO" style="display:block;" width="300px" />
 			<div id="buttonO" style="position:relative; width:100%; height:25%; visibility: hidden;">
 			</div>
 		</div>
 
 		<div id="imageA_div" style="height:302px; width:302px; display:inline-block; border:0px solid black;">
-			<!-- <div id="feedbackA" style="display:block; height: 30px"></div> -->
+			<div id="feedbackA" style="display:block; height: 30px"></div>
 			<img id="imageA" style="display:block;" width="300px" />
 			<div id="buttonA" style="position:relative; width:100%; height:25%">
 				<button onclick="submitAnswer('a')" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index: 10; font-size:14pt" type="button">Choose A</button>
@@ -467,7 +467,7 @@ function restartExperiment() {
 		</div>
 
 		<div id="imageB_div" style="height:302px; width:302px; display:inline-block; border:0px solid black;">
-			<!-- <div id="feedbackB" style="display:block; height: 30px"></div> -->
+			<div id="feedbackB" style="display:block; height: 30px"></div>
 			<img id="imageB" style="display:block;" width="300px" />
 			<div id="buttonB" style="position:relative; width:100%; height:25%">
 				<button onclick="submitAnswer('b')" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index: 10; font-size:14pt" type="button">Choose B</button>
@@ -475,7 +475,7 @@ function restartExperiment() {
 		</div>
 
 		<div id="imageC_div" style="height:302px; width:302px; display:inline-block; border:0px solid black;">
-			<!-- <div id="feedbackC" style="display:block; height: 30px"></div> -->
+			<div id="feedbackC" style="display:block; height: 30px"></div>
 			<img id="imageC" style="display:block;" width="300px" />
 			<div id="buttonC" style="position:relative; width:100%; height:25%">
 				<button onclick="submitAnswer('c')" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index: 10; font-size:14pt" type="button">Choose C</button>

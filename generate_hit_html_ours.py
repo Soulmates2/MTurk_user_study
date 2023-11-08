@@ -33,7 +33,7 @@ args.experiment_description = 'You will take part in an experiment involving vis
 # args.prompt = 'We want to edit images by moving a red point to a blue point. Which one appears the most <b>plausible</b> and <b>realistic</b> edited image to you? Choose one of the following images.'
 # args.prompt = 'We want to edit images by dragging a red point to a blue point. Which output would you expect after dragging the point? Choose one of the following images.'
 args.prompt = 'When the image in the black box is edited by dragging the red point, as indicated by the arrow, while fixing the green point, which of the outputs below do you anticipate? Please select one of the options.'
-args.out_filename = 'data/20231103_2d_1/APAP_choose_multi_plausible.html'
+args.out_filename = 'data/20231107_2d_1/APAP_choose_multi_plausible.html'
 
 
 

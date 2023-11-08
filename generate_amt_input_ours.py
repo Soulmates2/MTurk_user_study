@@ -2,6 +2,7 @@ import argparse
 import csv
 import numpy as np
 import os
+import random
 from random import shuffle
 from random import randint
 import hashlib
@@ -20,7 +21,7 @@ parser.add_argument('--n_hits', type=int, default=10)
 # See http://uniqueturker.myleott.com/ for more information about how this works
 parser.add_argument('--unique_id', type=str, default='')
 # The name of the experiment
-parser.add_argument('--experiment_name', type=str, default='20231103_2d_1')
+parser.add_argument('--experiment_name', type=str, default='20231107_2d_1')
 # The name of condition O (Original image before editing)
 parser.add_argument('--conditionO', type=str, default='Source')
 # The name of condition A
@@ -32,6 +33,8 @@ parser.add_argument('--conditionC', type=str, default='ARAP')
 
 
 args = parser.parse_args()
+
+random.seed(2024)
 np.random.seed(2024)
 
 
@@ -41,11 +44,11 @@ n_comparisons_per_hit = n_real_comparisons_per_hit + n_vigilance_tests_per_hit
 n_hits = args.n_hits
 experiment_name = args.experiment_name
 # unique_id = args.unique_id
-unique_id = hashlib.md5(('APAP'+str(time.time())).encode('utf-8')).hexdigest()
 conditionO = args.conditionO
 conditionA = args.conditionA
 conditionB = args.conditionB
 conditionC = args.conditionC
+num_condition = 99
 # Compute the name of the output csv file
 output_loc = f'data/{experiment_name}/{experiment_name}.csv'
 
@@ -81,13 +84,15 @@ vigilance_true_dir = '{}/vigilance_true'.format(experiment_name)
 vigilance_random_dir = '{}/vigilance_random'.format(experiment_name)
 
 for hit_idx in range(n_hits):
+	unique_id = hashlib.md5(('APAP'+str(time.time())).encode('utf-8')).hexdigest()
+
 	row = ''
 	row += unique_id + ','
 	# Build the list of images for each condition
-	images_o = ['{}/{}'.format(conditionO_dir, i) for i in range(1, n_real_comparisons_per_hit+1)]
-	images_a = ['{}/{}'.format(conditionA_dir, i) for i in range(1, n_real_comparisons_per_hit+1)]
-	images_b = ['{}/{}'.format(conditionB_dir, i) for i in range(1, n_real_comparisons_per_hit+1)]
-	images_c = ['{}/{}'.format(conditionC_dir, i) for i in range(1, n_real_comparisons_per_hit+1)]
+	images_o = ['{}/{}'.format(conditionO_dir, i) for i in range(1, num_condition+1)]
+	images_a = ['{}/{}'.format(conditionA_dir, i) for i in range(1, num_condition+1)]
+	images_b = ['{}/{}'.format(conditionB_dir, i) for i in range(1, num_condition+1)]
+	images_c = ['{}/{}'.format(conditionC_dir, i) for i in range(1, num_condition+1)]
 	
 	# # Randomize order (this randomizes the pairing)
 	# shuffle(images_a)
@@ -95,10 +100,10 @@ for hit_idx in range(n_hits):
 	# Randomize order, but keep pairs intact (so we compare against different conditions of the same item (e.g. mesh, scene, etc.))
 	indices = list(range(0, len(images_a)))
 	shuffle(indices)
-	images_o = [images_o[i] for i in indices]
-	images_a = [images_a[i] for i in indices]
-	images_b = [images_b[i] for i in indices]
-	images_c = [images_c[i] for i in indices]
+	images_o = [images_o[i] for i in indices][:n_real_comparisons_per_hit]
+	images_a = [images_a[i] for i in indices][:n_real_comparisons_per_hit]
+	images_b = [images_b[i] for i in indices][:n_real_comparisons_per_hit]
+	images_c = [images_c[i] for i in indices][:n_real_comparisons_per_hit]
 	# Pick random indices at which to insert vigilance tests
 	# (Insert the true image into images_a, and the false/random image into images_b)
 	for v in range(0, n_vigilance_tests_per_hit):
